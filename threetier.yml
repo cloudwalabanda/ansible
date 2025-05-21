@@ -1,0 +1,35 @@
+- name: threetier
+  hosts: all
+  become: true
+  tasks:
+     - name: update apt
+       shell: apt update
+
+     - name: install nginx
+       apt: name=nginx state=present
+       when: inventory_hostname in groups['webserver']
+
+     - name: install php
+       apt: name=php state=present
+       when: inventory_hostname in groups['appserver']
+
+     - name: install php-fpm
+       apt: name=php8.3-fpm state=present
+       when: inventory_hostname in groups['appserver']
+
+     - name: install mariadb
+       apt: name=mariadb-server state=present
+       when: inventory_hostname in groups['dbserver']
+
+     - name: start nginx
+       service: name=nginx state=started
+       when: inventory_hostname in groups['webserver']
+
+     - name: start php-fpm
+       service: name=php8.3-fpm state=started
+       when: inventory_hostname in groups['appserver']
+
+
+     - name: start mariadb
+       service: name=mariadb state=started
+       when: inventory_hostname in groups['dbserver']
